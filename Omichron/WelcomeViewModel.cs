@@ -2,7 +2,6 @@
 using ReactiveUI;
 using System.Reactive.Linq;
 using System.Reactive.Disposables;
-using ReactiveUI.Legacy;
 
 namespace Omichron
 {
@@ -11,7 +10,7 @@ namespace Omichron
     // versions or design-time versions of ViewModels much easier.
     public interface IWelcomeViewModel : IRoutableViewModel
     {
-        IReactiveCommand HelloWorld { get; }
+        ReactiveCommand HelloWorld { get; }
         Interaction<string, bool> Helloed { get; }
     }
 
@@ -34,8 +33,8 @@ namespace Omichron
 
         public IScreen HostScreen { get; protected set; }
 
-        public ReactiveCommand<object> HelloWorld { get; protected set; }
-        IReactiveCommand IWelcomeViewModel.HelloWorld { get { return HelloWorld; } }
+        public ReactiveCommand HelloWorld { get; protected set; }
+        ReactiveCommand IWelcomeViewModel.HelloWorld { get { return HelloWorld; } }
 
         public Interaction<string, bool> Helloed => this.helloed;
 
@@ -61,9 +60,7 @@ namespace Omichron
              * normally,
              */
 
-            HelloWorld = ReactiveUI.Legacy.ReactiveCommand.Create();
-
-            HelloWorld.Subscribe(async param => await helloed.Handle("It works!!!"));
+            HelloWorld = ReactiveCommand.Create(async () => await helloed.Handle("It works!!!"));
 
             this.WhenNavigatedTo(() => Bar());
         }
