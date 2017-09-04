@@ -16,8 +16,6 @@ namespace Omichron
 
     public class WelcomeViewModel : ReactiveObject, IWelcomeViewModel
     {
-        private readonly Interaction<string, bool> helloed = new Interaction<string, bool>();
-
         /* COOLSTUFF: What is UrlPathSegment
          * 
          * Imagine that the router state is like the path of the URL - what 
@@ -26,17 +24,13 @@ namespace Omichron
          * constant. You can get the whole path via 
          * IRoutingState.GetUrlForCurrentRoute.
          */
-        public string UrlPathSegment
-        {
-            get { return "welcome"; }
-        }
+        public string UrlPathSegment => "welcome";
 
         public IScreen HostScreen { get; protected set; }
 
-        public ReactiveCommand HelloWorld { get; protected set; }
-        ReactiveCommand IWelcomeViewModel.HelloWorld { get { return HelloWorld; } }
+        public ReactiveCommand HelloWorld { get; }
 
-        public Interaction<string, bool> Helloed => this.helloed;
+        public Interaction<string, bool> Helloed { get; } = new Interaction<string, bool>();
 
         /* COOLSTUFF: Why the Screen here?
          *
@@ -49,18 +43,7 @@ namespace Omichron
         {
             HostScreen = screen;
 
-            /* COOLSTUFF: Where's the Execute handler?
-             * 
-             * We want this command to display a MessageBox. However, 
-             * displaying a MessageBox is a very View'y thing to do. Instead, 
-             * the ViewModel is going to create the ReactiveCommand and the
-             * *View* is going to Subscribe to it. That way, we can test in
-             * the Unit Test runner that HelloWorld is Execute'd at the right
-             * times, but still display the MessageBox when the code runs 
-             * normally,
-             */
-
-            HelloWorld = ReactiveCommand.Create(async () => await helloed.Handle("It works!!!"));
+            HelloWorld = ReactiveCommand.Create(async () => await Helloed.Handle("It works!!!"));
 
             this.WhenNavigatedTo(() => Bar());
         }
