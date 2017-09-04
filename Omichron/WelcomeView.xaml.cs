@@ -17,19 +17,19 @@ namespace Omichron
 
             this.WhenAnyValue(x => x.ViewModel).BindTo(this, x => x.DataContext);
 
-            ReactiveUI.Legacy.UserError.RegisterHandler(async error =>
+            this.WhenActivated(d =>
             {
-                RxApp.MainThreadScheduler.Schedule(error,
-                (scheduler, userError) =>
-                {
-                    // NOTE: this code really shouldn't throw away the MessageBoxResult
-                    var result = MessageBox.Show(userError.ErrorMessage);
-                    return Disposable.Empty;
-                });
-
-                return await Task.Run(() => {
-                    return ReactiveUI.Legacy.RecoveryOptionResult.CancelOperation;
-                });
+                d(this
+                    .ViewModel
+                    .Helloed
+                    .RegisterHandler(async interraction =>
+                    {
+                        await Task.Run(() =>
+                        {
+                            var dialogResult = MessageBox.Show(interraction.Input);
+                            interraction.SetOutput(dialogResult == MessageBoxResult.OK);
+                        });
+                    }));
             });
         }
 

@@ -12,10 +12,13 @@ namespace Omichron
     public interface IWelcomeViewModel : IRoutableViewModel
     {
         IReactiveCommand HelloWorld { get; }
+        Interaction<string, bool> Helloed { get; }
     }
 
     public class WelcomeViewModel : ReactiveObject, IWelcomeViewModel
     {
+        private readonly Interaction<string, bool> helloed = new Interaction<string, bool>();
+
         /* COOLSTUFF: What is UrlPathSegment
          * 
          * Imagine that the router state is like the path of the URL - what 
@@ -32,8 +35,9 @@ namespace Omichron
         public IScreen HostScreen { get; protected set; }
 
         public ReactiveCommand<object> HelloWorld { get; protected set; }
-
         IReactiveCommand IWelcomeViewModel.HelloWorld { get { return HelloWorld; } }
+
+        public Interaction<string, bool> Helloed => this.helloed;
 
         /* COOLSTUFF: Why the Screen here?
          *
@@ -59,7 +63,7 @@ namespace Omichron
 
             HelloWorld = ReactiveUI.Legacy.ReactiveCommand.Create();
 
-            HelloWorld.Subscribe(param => UserError.Throw(new UserError("It works!!!")));
+            HelloWorld.Subscribe(async param => await helloed.Handle("It works!!!"));
 
             this.WhenNavigatedTo(() => Bar());
         }
