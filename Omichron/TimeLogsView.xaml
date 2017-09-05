@@ -8,7 +8,20 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="600">
     <Grid>
-        <DataGrid ItemsSource="{Binding Logs}" AutoGenerateColumns="False" VerticalAlignment="Top">
+        <DataGrid ItemsSource="{Binding GLogs, diag:PresentationTraceSources.TraceLevel=High}" 
+                  AutoGenerateColumns="False" VerticalAlignment="Top">
+            <DataGrid.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Path=Name}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </DataGrid.GroupStyle>
+
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding IssueId}" Header="IssueId" Width="100" IsReadOnly="True" />
                 <DataGridTextColumn Binding="{Binding Title}" Header="Summary" Width="*" IsReadOnly="True" />
