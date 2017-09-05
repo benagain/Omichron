@@ -2,6 +2,8 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Collections.Generic;
+using System.Reactive.Linq;
 
 namespace Omichron
 {
@@ -40,23 +42,37 @@ namespace Omichron
 
     public interface ITimeLogsViewModel : IRoutableViewModel
     {
-        TimeLog[] Logs { get; set;  }
+        List<TimeLog> Logs { get; }
     }
 
     public class TimeLogsViewModel : ReactiveObject, ITimeLogsViewModel
     {
         private IScreen hostScreen;
+        private ObservableAsPropertyHelper<List<TimeLog>> logs;
 
         public TimeLogsViewModel(IScreen screen)
         {
             hostScreen = screen;
-            Logs = new[]
+
+            logs = Observable
+                .Interval(TimeSpan.FromSeconds(3), RxApp.MainThreadScheduler)
+                .StartWith(0)
+                .Select(x => AnotherEvent())
+                .ToProperty(this, x => x.Logs, new List<TimeLog>());
+        }
+
+        private static int id = 123;
+
+        private List<TimeLog> AnotherEvent()
+        {
+            var current = logs?.Value ?? new List<TimeLog>();
+            return new List<TimeLog>(current)
             {
-                new TimeLog("midas-123", DateTime.UtcNow, TimeSpan.FromHours(3)),
+                new TimeLog($"midas-{id++}", DateTime.UtcNow, TimeSpan.FromHours(3))
             };
         }
 
-        public TimeLog[] Logs { get; set;  }
+        public List<TimeLog> Logs => logs.Value;
 
         string IRoutableViewModel.UrlPathSegment => "timelog";
 
