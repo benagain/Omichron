@@ -40,14 +40,14 @@ namespace Omichron
             LogHost.Default.Level = LogLevel.Debug;
 
             // Navigate to the opening page of the application
-            Router.Navigate.Execute(new WelcomeViewModel(this));
+            Router.Navigate.Execute(new TimeLogsViewModel(this));
         }
 
         private void RegisterParts(IMutableDependencyResolver dependencyResolver)
         {
             dependencyResolver.RegisterConstant(this, typeof(IScreen));
 
-            dependencyResolver.Register(() => new WelcomeView(), typeof(IViewFor<WelcomeViewModel>));
+            dependencyResolver.Register(() => new TimeLogsView(), typeof(IViewFor<TimeLogsViewModel>));
         }
     }
 }
