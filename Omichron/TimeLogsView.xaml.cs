@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -48,8 +50,16 @@ namespace Omichron
         {
             hostScreen = screen;
 
-            Logs = Observable.Interval(TimeSpan.FromSeconds(10), RxApp.MainThreadScheduler)
-                .StartWith(-1)
+            var periodic = Observable.Interval(TimeSpan.FromSeconds(10), RxApp.MainThreadScheduler);
+
+            var updateOnWindowFocus = Observable.FromEventPattern(
+                    h => Application.Current.Activated += h,
+                    h => Application.Current.Activated -= h)
+                .Do(_ => Debug.WriteLine("Application activated!"))
+                .Select(_ => 1L);
+
+            Logs = periodic
+                .Merge(updateOnWindowFocus)
                 .SelectMany(AnotherEvent)
                 .CreateCollection(RxApp.MainThreadScheduler);
 
