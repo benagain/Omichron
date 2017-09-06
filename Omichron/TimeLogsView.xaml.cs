@@ -37,56 +37,40 @@ namespace Omichron
 
     public interface ITimeLogsViewModel : IRoutableViewModel
     {
-        ReactiveList<TimeLog> Logs { get; }
+        IReactiveDerivedList<TimeLog> Logs { get; }
     }
 
     public class TimeLogsViewModel : ReactiveObject, ITimeLogsViewModel
     {
         private IScreen hostScreen;
-        private ObservableAsPropertyHelper<ReactiveList<TimeLog>> logs;
 
         public TimeLogsViewModel(IScreen screen)
         {
             hostScreen = screen;
 
-            //logs = Observable
-            //    .Interval(TimeSpan.FromSeconds(3), RxApp.MainThreadScheduler)
-            //    .StartWith(0)
-            //    .Select(x => AnotherEvent())
-            //    .ToProperty(this, x => x.Logs, new ReactiveList<TimeLog>());
+            Logs = Observable.Interval(TimeSpan.FromSeconds(10), RxApp.MainThreadScheduler)
+                .StartWith(-1)
+                .SelectMany(AnotherEvent)
+                .CreateCollection(RxApp.MainThreadScheduler);
 
-            var otherLogs = new ReactiveList<TimeLog>();
-
-            GLogs = new ListCollectionView(otherLogs);
-            GLogs.GroupDescriptions.Add(new PropertyGroupDescription("IssueId"));
-
-            var up = Observable.Interval(TimeSpan.FromSeconds(10), RxApp.MainThreadScheduler)
-                .StartWith(0)
-                .Select(x => AnotherEvent())
-                .Subscribe(d =>
-                {
-                    otherLogs.Clear();
-                    foreach (var x in d) otherLogs.Add(x);
-                });
+            CollectionViewSource
+                .GetDefaultView(Logs)
+                .GroupDescriptions
+                .Add(new PropertyGroupDescription(nameof(TimeLog.IssueId)));
         }
 
         private static int id = 123;
 
-        private ReactiveList<TimeLog> AnotherEvent()
+        private IObservable<TimeLog> AnotherEvent(long filter)
         {
-            var current = logs?.Value ?? new ReactiveList<TimeLog>();
-            var news = Enumerable
-                .Range(0, current.Any() ? 1 : 3)
-                .Select(_ => new TimeLog($"midas-{id++}", DateTime.UtcNow, TimeSpan.FromHours(3)));
-
-            var l = new ReactiveList<TimeLog>(current);
-            l.AddRange(news);
-            return l;
+            var count = filter == -1 ? 2 : 1;
+            return Enumerable
+                .Range(0, count)
+                .Select(_ => new TimeLog($"midas-{id++}", DateTime.UtcNow, TimeSpan.FromHours(3)))
+                .ToObservable();
         }
 
-        public ReactiveList<TimeLog> Logs => logs.Value;
-
-        public ListCollectionView GLogs { get; }
+        public IReactiveDerivedList<TimeLog> Logs { get; }
 
         string IRoutableViewModel.UrlPathSegment => "timelog";
 
