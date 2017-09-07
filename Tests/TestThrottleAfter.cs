@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using Omichron;
 using Microsoft.Reactive.Testing;
+using Omichron;
 using Ploeh.AutoFixture.Xunit2;
 using ReactiveUI;
+using Tests.Helpers;
 using Xunit;
 
 namespace Tests
@@ -41,32 +41,38 @@ namespace Tests
         }
 
         [Theory, AutoData]
-        public void WhenTwoElementsThatAreFarApart_BothAreObserved(TestScheduler scheduler, Subject<char> subject, long delay, char a, char b)
+        public void WhenTwoElementsInsideDuration_OnlyFirstIsObserved(TestScheduler scheduler, long delay, int observed, int ignored)
         {
-            var expected = new[] { a, b };
+            var source = scheduler.CreateColdObservable(
+                Sequence.OnNext(1, observed),
+                Sequence.OnNext(delay, ignored));
 
-            var actual = subject.AsObservable()
-                .ThrottleAfter(TimeSpan.FromMilliseconds(delay), scheduler)
-                .CreateCollection();
+            var actual = source
+                .ThrottleAfter(TimeSpan.FromTicks(delay), scheduler)
+                .CreateObserver(scheduler);
 
-            scheduler.Schedule(TimeSpan.FromMilliseconds(0), () => subject.OnNext(a));
-            scheduler.Schedule(TimeSpan.FromMilliseconds(delay + 1), () => subject.OnNext(a));
-            scheduler.AdvanceTo(delay + 2);
+            scheduler.AdvanceTo(delay + 1);
 
-            Assert.Equal(expected, actual);
+            actual.Messages.AssertEqual(
+                Sequence.OnNext(1, observed));
         }
-    }
 
-    static class ScheduleExtensions
-    {
-        public static IDisposable Schedule<TAbsolute, TRelative, TState>(this VirtualTimeSchedulerBase<TAbsolute, TRelative> scheduler, TState state, Action action)
-            where TAbsolute : IComparable<TAbsolute>
+        [Theory, AutoData]
+        public void WhenTwoElementsOutsideDuration_BothAreObserved(TestScheduler scheduler, long delay, int observed, int alsoObserved)
         {
-            return scheduler.Schedule(state, (a, b) =>
-            {
-                action();
-                return Disposable.Empty;
-            });
+            var source = scheduler.CreateColdObservable(
+                Sequence.OnNext(1, observed),
+                Sequence.OnNext(delay + 1, alsoObserved));
+
+            var actual = source
+                .ThrottleAfter(TimeSpan.FromTicks(delay), scheduler)
+                .CreateObserver(scheduler);
+
+            scheduler.AdvanceTo(delay + 1);
+
+            actual.Messages.AssertEqual(
+                Sequence.OnNext(1, observed),
+                Sequence.OnNext(delay + 1, alsoObserved));
         }
     }
 }
