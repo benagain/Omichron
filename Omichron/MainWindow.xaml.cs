@@ -10,6 +10,10 @@ namespace Omichron
         public MainWindow()
         {
             InitializeComponent();
+            AppBootstrapper = new AppBootstrapper();
+            DataContext = AppBootstrapper;
         }
+
+        public AppBootstrapper AppBootstrapper { get; }
     }
 }
