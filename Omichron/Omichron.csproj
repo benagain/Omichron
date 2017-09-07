@@ -75,10 +75,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ObservableExtensions.cs" />
     <Compile Include="TimeLog.cs" />
     <Compile Include="TimeLogsView.xaml.cs">
       <DependentUpon>TimeLogsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TimeLogsViewModel.cs" />
     <Compile Include="WelcomeViewModel.cs" />
     <Page Include="TimeLogsView.xaml">
       <SubType>Designer</SubType>

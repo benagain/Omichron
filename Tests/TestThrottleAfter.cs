@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Microsoft.Reactive.Testing;
@@ -16,25 +15,29 @@ namespace Tests
         [Theory, AutoData]
         public void WhenNoSequence_NothingObserved(TestScheduler scheduler, Subject<char> subject, long delay)
         {
-            var actual = subject.AsObservable()
-                .ThrottleAfter(TimeSpan.FromMilliseconds(delay), scheduler)
-                .CreateCollection();
+            var source = scheduler.CreateColdObservable<int>();
+
+            var actual = source
+                .ThrottleAfter(TimeSpan.FromTicks(delay), scheduler)
+                .CreateObserver(scheduler);
 
             scheduler.AdvanceTo(delay + 1);
 
-            Assert.Empty(actual);
+            Assert.Empty(actual.Messages);
         }
 
         [Theory, AutoData]
-        public void WhenSingleElement_ItIsObserved(TestScheduler scheduler, Subject<char> subject, long delay, char c)
+        public void WhenSingleElement_ItIsObserved(TestScheduler scheduler, long delay, char c)
         {
             var expected = new[] { c };
 
-            var actual = subject.AsObservable()
-                .ThrottleAfter(TimeSpan.FromMilliseconds(delay), scheduler)
+            var source = scheduler.CreateColdObservable(
+                Sequence.OnNext(1, c));
+
+            var actual = source.AsObservable()
+                .ThrottleAfter(TimeSpan.FromTicks(delay), scheduler)
                 .CreateCollection();
 
-            scheduler.Schedule(TimeSpan.FromMilliseconds(0), () => subject.OnNext(c));
             scheduler.AdvanceTo(delay + 1);
 
             Assert.Equal(expected, actual);
