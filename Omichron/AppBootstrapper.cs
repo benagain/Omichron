@@ -1,5 +1,11 @@
-﻿using ReactiveUI;
+﻿using System;
+using ReactiveUI;
 using Splat;
+using Omichron.Services;
+using System.Collections.Generic;
+using System.Reactive.Linq;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Omichron
 {
@@ -40,14 +46,35 @@ namespace Omichron
             LogHost.Default.Level = LogLevel.Debug;
 
             // Navigate to the opening page of the application
-            Router.Navigate.Execute(new TimeLogsViewModel(this));
+            Router.Navigate.Execute(dependencyResolver.GetService<TimeLogsViewModel>());
         }
 
         private void RegisterParts(IMutableDependencyResolver dependencyResolver)
         {
             dependencyResolver.RegisterConstant(this, typeof(IScreen));
 
+            dependencyResolver.Register(() => 
+                new TimeLogsViewModel(
+                    this,
+                    dependencyResolver.GetService<TimeLogSource>()), 
+                typeof(TimeLogsViewModel));
             dependencyResolver.Register(() => new TimeLogsView(), typeof(IViewFor<TimeLogsViewModel>));
+            dependencyResolver.Register(() => new JiraTimeLog(), typeof(TimeLogSource));
+        }
+
+        private class JiraTimeLog : TimeLogSource
+        {
+            private static int count = 1;
+
+            public Task<List<TimeLog>> Search()
+            {
+                var random = new Random();
+                return Task.FromResult(
+                    Enumerable
+                        .Range(0, count++)
+                        .Select(x => new TimeLog($"hello {++x}", DateTime.UtcNow, TimeSpan.FromMinutes(random.Next(240))))
+                        .ToList());
+            }
         }
     }
 }

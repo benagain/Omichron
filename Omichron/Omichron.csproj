@@ -37,6 +37,9 @@
     <Reference Include="ReactiveUI, Version=7.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\reactiveui-core.7.4.0\lib\Net45\ReactiveUI.dll</HintPath>
     </Reference>
+    <Reference Include="ReactiveUI.Events, Version=7.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\reactiveui-events.7.3.0\lib\Net45\ReactiveUI.Events.dll</HintPath>
+    </Reference>
     <Reference Include="Splat, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Splat.1.4.0\lib\Net45\Splat.dll</HintPath>
     </Reference>
@@ -76,7 +79,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ObservableExtensions.cs" />
-    <Compile Include="TimeLog.cs" />
+    <Compile Include="Services\TimeLogSource.cs" />
+    <Compile Include="Services\TimeLog.cs" />
     <Compile Include="TimeLogsView.xaml.cs">
       <DependentUpon>TimeLogsView.xaml</DependentUpon>
     </Compile>

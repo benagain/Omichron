@@ -5,6 +5,7 @@ using Microsoft.Reactive.Testing;
 using Omichron;
 using Ploeh.AutoFixture.Xunit2;
 using ReactiveUI;
+using ReactiveUI.Testing;
 using Tests.Helpers;
 using Xunit;
 
@@ -63,6 +64,18 @@ namespace Tests
         [Theory, AutoData]
         public void WhenTwoElementsOutsideDuration_BothAreObserved(TestScheduler scheduler, long delay, int observed, int alsoObserved)
         {
+            //scheduler.With(x =>
+            //{
+            //    var actualx = Observable
+            //        .Interval(TimeSpan.FromTicks(10), x)
+            //        .ThrottleAfter(TimeSpan.FromTicks(7), x)
+            //        .CreateCollection(x);
+
+            //    x.AdvanceTo(11);
+
+            //    Assert.Equal(1, actualx.Count);
+            //});
+
             var source = scheduler.CreateColdObservable(
                 Sequence.OnNext(1, observed),
                 Sequence.OnNext(delay + 1, alsoObserved));

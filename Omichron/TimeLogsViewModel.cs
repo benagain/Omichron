@@ -1,57 +1,65 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Windows;
 using System.Windows.Data;
 using ReactiveUI;
+using Omichron.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Omichron
 {
     public interface ITimeLogsViewModel : IRoutableViewModel
     {
-        IReactiveDerivedList<TimeLog> Logs { get; }
+        ReactiveList<TimeLog> Logs { get; }
+        ReactiveCommand<Unit, Unit> WindowActivated { get; }
     }
 
     public class TimeLogsViewModel : ReactiveObject, ITimeLogsViewModel
     {
         private IScreen hostScreen;
+        private TimeLogSource source;
+        private IScheduler scheduler;
 
-        public TimeLogsViewModel(IScreen screen)
+        public TimeLogsViewModel(IScreen screen, TimeLogSource source, IScheduler customScheduler = null)
         {
             hostScreen = screen;
+            this.source = source;
+            this.scheduler = customScheduler ?? RxApp.MainThreadScheduler;
 
-            var periodic = Observable.Interval(TimeSpan.FromSeconds(10), RxApp.MainThreadScheduler);
+            ExecuteSearch = ReactiveCommand.CreateFromTask<Unit, List<TimeLog>>(
+               searchTerm => source.Search()
+            );
 
-            var updateOnWindowFocus = Observable.FromEventPattern(
-                    h => Application.Current.Activated += h,
-                    h => Application.Current.Activated -= h)
-                .Do(_ => Debug.WriteLine("Application activated!"))
-                .Select(_ => 1L);
+            WindowActivated = ReactiveCommand.Create(() => { ExecuteSearch.Execute(); });
 
-            Logs = periodic
-                .Merge(updateOnWindowFocus)
-                .SelectMany(AnotherEvent)
-                .CreateCollection(RxApp.MainThreadScheduler);
+            ExecuteSearch.CreateCollection();
+            ExecuteSearch.Subscribe(x =>
+            {
+                Logs.Clear();
+                foreach (var y in x) Logs.Add(y);
+            });
 
             CollectionViewSource
                 .GetDefaultView(Logs)
                 .GroupDescriptions
                 .Add(new PropertyGroupDescription(nameof(TimeLog.IssueId)));
+
+            Observable
+                .Interval(TimeSpan.FromSeconds(3))
+                .StartWith(0)
+                .Select(_ => Unit.Default)
+                .InvokeCommand(ExecuteSearch);
         }
 
-        private static int id = 123;
+        public ReactiveCommand<Unit, Unit> WindowActivated { get; }
 
-        private IObservable<TimeLog> AnotherEvent(long filter)
-        {
-            var count = filter == -1 ? 2 : 1;
-            return Enumerable
-                .Range(0, count)
-                .Select(_ => new TimeLog($"midas-{id++}", DateTime.UtcNow, TimeSpan.FromHours(3)))
-                .ToObservable();
-        }
+        public ReactiveCommand<Unit, List<TimeLog>> ExecuteSearch { get; }
 
-        public IReactiveDerivedList<TimeLog> Logs { get; }
+        public ReactiveList<TimeLog> Logs { get; } = new ReactiveList<TimeLog>();
 
         string IRoutableViewModel.UrlPathSegment => "timelog";
 

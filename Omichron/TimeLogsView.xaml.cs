@@ -1,6 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using ReactiveUI;
+using System.Reactive.Linq;
+using System;
 
 namespace Omichron
 {
@@ -14,6 +16,13 @@ namespace Omichron
             InitializeComponent();
 
             this.WhenAnyValue(x => x.ViewModel).BindTo(this, x => x.DataContext);
+
+            //ReactiveUI.Events.System.Windows.ApplicationEvents
+            new ApplicationEvents(Application.Current).Activated
+                .Do(x => Console.WriteLine(x))
+                //.InvokeCommand(ViewModel?.WindowActivated)
+                .Subscribe(x => ViewModel?.WindowActivated?.Execute());
+            //this.Events().MouseLeave.Subscribe(_ => Console.WriteLine("Bye!"));
         }
 
         public ITimeLogsViewModel ViewModel
