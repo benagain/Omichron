@@ -1,14 +1,11 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
+﻿using Omichron.Services;
+using ReactiveUI;
+using System;
+using System.Collections.Generic;
 using System.Reactive;
-using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Data;
-using ReactiveUI;
-using Omichron.Services;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Omichron
 {
@@ -19,7 +16,7 @@ namespace Omichron
         ReactiveCommand<Unit, List<TimeLog>> ExecuteSearch { get; }
     }
 
-    public class TimeLogsViewModel : ReactiveObject, ITimeLogsViewModel
+    public class TimeLogsViewModel : ReactiveObject, ITimeLogsViewModel, ISupportsActivation
     {
         private IScreen hostScreen;
         private TimeLogSource source;
@@ -33,21 +30,25 @@ namespace Omichron
               searchTerm => source.Search()
             );
 
-            WindowActivated = ReactiveCommand.Create(
-                () => { ExecuteSearch.Execute(); }
-            );
-
-            ExecuteSearch.CreateCollection();
-            ExecuteSearch.Subscribe(x =>
+            (this).WhenActivated(disposables =>
             {
-                Logs.Clear();
-                foreach (var y in x) Logs.Add(y);
+                ExecuteSearch.AddTo(disposables);
+
+                ExecuteSearch
+                    .Subscribe(x => { DoExecuteSearch(x); })
+                    .AddTo(disposables);
             });
 
             CollectionViewSource
                 .GetDefaultView(Logs)
                 .GroupDescriptions
                 .Add(new PropertyGroupDescription(nameof(TimeLog.IssueId)));
+        }
+
+        private void DoExecuteSearch(List<TimeLog> x)
+        {
+            Logs.Clear();
+            foreach (var y in x) Logs.Add(y);
         }
 
         public ReactiveCommand<Unit, Unit> WindowActivated { get; }
@@ -59,5 +60,7 @@ namespace Omichron
         string IRoutableViewModel.UrlPathSegment => "timelog";
 
         IScreen IRoutableViewModel.HostScreen => hostScreen;
+
+        ViewModelActivator ISupportsActivation.Activator { get; } = new ViewModelActivator();
     }
 }

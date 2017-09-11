@@ -2,8 +2,10 @@
 using NSubstitute;
 using Omichron;
 using Omichron.Services;
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Reactive.Disposables;
 using Xunit;
 
 namespace Tests
@@ -24,6 +26,7 @@ namespace Tests
             var api = Substitute.For<TimeLogSource>();
             api.Search().Returns(logs);
 
+            ((ISupportsActivation)sut).Activator.Activate();
             sut.Logs.Count.Should().Be(0);
         }
 
@@ -33,10 +36,9 @@ namespace Tests
             var api = Substitute.For<TimeLogSource>();
             api.Search().Returns(logs);
 
-            {
-                sut.ExecuteSearch.Execute().Subscribe();
-                Assert.Equal(logs.Count, sut.Logs.Count);
-            };
+            ((ISupportsActivation)sut).Activator.Activate();
+            sut.ExecuteSearch.Execute().Subscribe();
+            Assert.Equal(logs.Count, sut.Logs.Count);
         }
     }
 }
