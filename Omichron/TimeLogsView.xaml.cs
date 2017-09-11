@@ -23,13 +23,6 @@ namespace Omichron
                 this.WhenAnyValue(x => x.ViewModel)
                     .BindTo(this, x => x.DataContext)
                     .AddTo(disposables);
-
-                appEvents
-                    .Activated
-                    .SelectMany(_ => ViewModel.ExecuteSearch.Execute())
-                    .Subscribe()
-                    .AddTo(disposables)
-                    ;
             });
         }
 

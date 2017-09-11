@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Windows;
 using System.Windows.Data;
 
 namespace Omichron
@@ -12,7 +13,6 @@ namespace Omichron
     public interface ITimeLogsViewModel : IRoutableViewModel
     {
         ReactiveList<TimeLog> Logs { get; }
-        ReactiveCommand<Unit, Unit> WindowActivated { get; }
         ReactiveCommand<Unit, List<TimeLog>> ExecuteSearch { get; }
     }
 
@@ -21,7 +21,7 @@ namespace Omichron
         private IScreen hostScreen;
         private TimeLogSource source;
 
-        public TimeLogsViewModel(IScreen screen, TimeLogSource source)
+        public TimeLogsViewModel(IScreen screen, IApplicationEvents applicationEvents, TimeLogSource source)
         {
             hostScreen = screen;
             this.source = source;
@@ -37,6 +37,12 @@ namespace Omichron
                 ExecuteSearch
                     .Subscribe(x => { DoExecuteSearch(x); })
                     .AddTo(disposables);
+
+                applicationEvents
+                    .Activated
+                    .SelectMany(_ => ExecuteSearch.Execute())
+                    .Subscribe()
+                    .AddTo(disposables);
             });
 
             CollectionViewSource
@@ -50,8 +56,6 @@ namespace Omichron
             Logs.Clear();
             foreach (var y in x) Logs.Add(y);
         }
-
-        public ReactiveCommand<Unit, Unit> WindowActivated { get; }
 
         public ReactiveCommand<Unit, List<TimeLog>> ExecuteSearch { get; }
 

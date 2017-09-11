@@ -2,10 +2,12 @@
 using NSubstitute;
 using Omichron;
 using Omichron.Services;
+using Ploeh.AutoFixture.Xunit2;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Windows;
 using Xunit;
 
 namespace Tests
@@ -31,13 +33,24 @@ namespace Tests
         }
 
         [Theory, AutoMockData]
-        public void Logs_are_retrieved_when_application_is_activated(TimeLogsViewModel sut, List<TimeLog> logs)
+        public void Logs_are_retrieved_when_search_is_executed(TimeLogsViewModel sut, List<TimeLog> logs)
         {
             var api = Substitute.For<TimeLogSource>();
             api.Search().Returns(logs);
 
             ((ISupportsActivation)sut).Activator.Activate();
             sut.ExecuteSearch.Execute().Subscribe();
+            Assert.Equal(logs.Count, sut.Logs.Count);
+        }
+
+        [Theory, AutoMockData]
+        public void Logs_are_retrieved_when_application_is_activated([Frozen] IApplicationEvents events, TimeLogsViewModel sut, [Frozen] List<TimeLog> logs, TimeLogSource api)
+        {
+            // Given
+            events.Activated.Returns(x => Observable.Return(new EventArgs()));
+            // When
+            ((ISupportsActivation)sut).Activator.Activate();
+            // Then
             Assert.Equal(logs.Count, sut.Logs.Count);
         }
     }

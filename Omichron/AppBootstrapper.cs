@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Omichron
 {
@@ -56,6 +57,7 @@ namespace Omichron
             dependencyResolver.Register(() => 
                 new TimeLogsViewModel(
                     this,
+                    new ApplicationEvents(Application.Current).ToInterface(),
                     dependencyResolver.GetService<TimeLogSource>()), 
                 typeof(TimeLogsViewModel));
             dependencyResolver.Register(() => new TimeLogsView(), typeof(IViewFor<TimeLogsViewModel>));
