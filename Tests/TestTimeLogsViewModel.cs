@@ -12,7 +12,6 @@ using Xunit;
 
 namespace Tests
 {
-
     public class TestTimeLogsViewModel
     {
         // This isn't apparently needed, leaving it for a while just in case!
@@ -23,35 +22,32 @@ namespace Tests
         //}
 
         [Theory, AutoMockData]
-        public void Logs_are_empty_after_construction(TimeLogsViewModel sut, List<TimeLog> logs)
+        public void Logs_are_empty_after_construction(TimeLogsViewModel sut, [Frozen] List<TimeLog> logs, TimeLogSource api)
         {
-            var api = Substitute.For<TimeLogSource>();
-            api.Search().Returns(logs);
-
             ((ISupportsActivation)sut).Activator.Activate();
-            sut.Logs.Count.Should().Be(0);
+            sut.Logs.Should().BeEmpty();
         }
 
         [Theory, AutoMockData]
-        public void Logs_are_retrieved_when_search_is_executed(TimeLogsViewModel sut, List<TimeLog> logs)
+        public void Logs_are_retrieved_when_search_is_executed(TimeLogsViewModel sut, [Frozen] List<TimeLog> expected, TimeLogSource api)
         {
-            var api = Substitute.For<TimeLogSource>();
-            api.Search().Returns(logs);
-
+            // Given
             ((ISupportsActivation)sut).Activator.Activate();
+            // When
             sut.ExecuteSearch.Execute().Subscribe();
-            Assert.Equal(logs.Count, sut.Logs.Count);
+            // Then
+            sut.Logs.Should().BeEquivalentTo(expected);
         }
 
         [Theory, AutoMockData]
-        public void Logs_are_retrieved_when_application_is_activated([Frozen] IApplicationEvents events, TimeLogsViewModel sut, [Frozen] List<TimeLog> logs, TimeLogSource api)
+        public void Logs_are_retrieved_when_application_is_activated([Frozen] IApplicationEvents events, TimeLogsViewModel sut, [Frozen] List<TimeLog> expected, TimeLogSource api)
         {
             // Given
             events.Activated.Returns(x => Observable.Return(new EventArgs()));
             // When
             ((ISupportsActivation)sut).Activator.Activate();
             // Then
-            Assert.Equal(logs.Count, sut.Logs.Count);
+            sut.Logs.Should().BeEquivalentTo(expected);
         }
     }
 }
