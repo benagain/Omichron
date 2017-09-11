@@ -1,9 +1,8 @@
 ﻿using FluentAssertions;
-using Microsoft.Reactive.Testing;
 using NSubstitute;
 using Omichron;
 using Omichron.Services;
-using ReactiveUI.Testing;
+using System;
 using System.Collections.Generic;
 using Xunit;
 
@@ -12,6 +11,13 @@ namespace Tests
 
     public class TestTimeLogsViewModel
     {
+        // This isn't apparently needed, leaving it for a while just in case!
+        //public TestTimeLogsViewModel()
+        //{
+        //    var x = RxApp.MainThreadScheduler;
+        //    //RxApp.MainThreadScheduler = System.Reactive.Concurrency.ImmediateScheduler.Instance;
+        //}
+
         [Theory, AutoMockData]
         public void Logs_are_empty_after_construction(TimeLogsViewModel sut, List<TimeLog> logs)
         {
@@ -27,11 +33,10 @@ namespace Tests
             var api = Substitute.For<TimeLogSource>();
             api.Search().Returns(logs);
 
-            new TestScheduler().With(x =>
             {
-                //x.AdvanceBy(100);
+                sut.ExecuteSearch.Execute().Subscribe();
                 Assert.Equal(logs.Count, sut.Logs.Count);
-            });
+            };
         }
     }
 }

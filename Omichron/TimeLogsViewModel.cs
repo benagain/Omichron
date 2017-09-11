@@ -16,25 +16,26 @@ namespace Omichron
     {
         ReactiveList<TimeLog> Logs { get; }
         ReactiveCommand<Unit, Unit> WindowActivated { get; }
+        ReactiveCommand<Unit, List<TimeLog>> ExecuteSearch { get; }
     }
 
     public class TimeLogsViewModel : ReactiveObject, ITimeLogsViewModel
     {
         private IScreen hostScreen;
         private TimeLogSource source;
-        private IScheduler scheduler;
 
-        public TimeLogsViewModel(IScreen screen, TimeLogSource source, IScheduler customScheduler = null)
+        public TimeLogsViewModel(IScreen screen, TimeLogSource source)
         {
             hostScreen = screen;
             this.source = source;
-            this.scheduler = customScheduler ?? RxApp.MainThreadScheduler;
 
             ExecuteSearch = ReactiveCommand.CreateFromTask<Unit, List<TimeLog>>(
-               searchTerm => source.Search()
+              searchTerm => source.Search()
             );
 
-            WindowActivated = ReactiveCommand.Create(() => { ExecuteSearch.Execute(); });
+            WindowActivated = ReactiveCommand.Create(
+                () => { ExecuteSearch.Execute(); }
+            );
 
             ExecuteSearch.CreateCollection();
             ExecuteSearch.Subscribe(x =>
@@ -47,12 +48,6 @@ namespace Omichron
                 .GetDefaultView(Logs)
                 .GroupDescriptions
                 .Add(new PropertyGroupDescription(nameof(TimeLog.IssueId)));
-
-            Observable
-                .Interval(TimeSpan.FromSeconds(3))
-                .StartWith(0)
-                .Select(_ => Unit.Default)
-                .InvokeCommand(ExecuteSearch);
         }
 
         public ReactiveCommand<Unit, Unit> WindowActivated { get; }

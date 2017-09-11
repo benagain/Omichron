@@ -78,6 +78,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="System.Reactive.Disposables\CompositeDisposableExtensions.cs" />
     <Compile Include="ObservableExtensions.cs" />
     <Compile Include="Services\TimeLogSource.cs" />
     <Compile Include="Services\TimeLog.cs" />
@@ -138,5 +139,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,8 +1,9 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using ReactiveUI;
-using System.Reactive.Linq;
+﻿using ReactiveUI;
 using System;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace Omichron
 {
@@ -15,14 +16,21 @@ namespace Omichron
         {
             InitializeComponent();
 
-            this.WhenAnyValue(x => x.ViewModel).BindTo(this, x => x.DataContext);
+            var appEvents = new ApplicationEvents(Application.Current);
 
-            //ReactiveUI.Events.System.Windows.ApplicationEvents
-            new ApplicationEvents(Application.Current).Activated
-                .Do(x => Console.WriteLine(x))
-                //.InvokeCommand(ViewModel?.WindowActivated)
-                .Subscribe(x => ViewModel?.WindowActivated?.Execute());
-            //this.Events().MouseLeave.Subscribe(_ => Console.WriteLine("Bye!"));
+            this.WhenActivated(disposables =>
+            {
+                this.WhenAnyValue(x => x.ViewModel)
+                    .BindTo(this, x => x.DataContext)
+                    .AddTo(disposables);
+
+                appEvents
+                    .Activated
+                    .SelectMany(_ => ViewModel.ExecuteSearch.Execute())
+                    .Subscribe()
+                    .AddTo(disposables)
+                    ;
+            });
         }
 
         public ITimeLogsViewModel ViewModel
@@ -40,4 +48,8 @@ namespace Omichron
             set { ViewModel = (ITimeLogsViewModel)value; }
         }
     }
+}
+
+namespace System.Reactive.Disposables
+{
 }
