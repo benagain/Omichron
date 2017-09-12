@@ -7,16 +7,17 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Data;
+using System.ComponentModel;
 
 namespace Omichron
 {
-    public interface ITimeLogsViewModel : IRoutableViewModel
+    public interface ITimeLogsViewModel
     {
         ReactiveList<TimeLog> Logs { get; }
         ReactiveCommand<Unit, List<TimeLog>> ExecuteSearch { get; }
     }
 
-    public class TimeLogsViewModel : ReactiveObject, ITimeLogsViewModel, ISupportsActivation
+    public class TimeLogsViewModel : ReactiveObject, ITimeLogsViewModel, IRoutableViewModel, ISupportsActivation
     {
         private IScreen hostScreen;
         private TimeLogSource source;
@@ -66,5 +67,25 @@ namespace Omichron
         IScreen IRoutableViewModel.HostScreen => hostScreen;
 
         ViewModelActivator ISupportsActivation.Activator { get; } = new ViewModelActivator();
+    }
+
+    public class DesignTimeLogsViewModel : ITimeLogsViewModel
+    {
+        public DesignTimeLogsViewModel()
+        {
+            Logs = new ReactiveList<TimeLog>
+            {
+                new TimeLog("Issue-1", new DateTime(2017, 07, 12, 10, 15, 00), TimeSpan.FromMinutes(15)),
+                new TimeLog("Issue-1", new DateTime(2017, 07, 12, 09, 00, 00), TimeSpan.FromMinutes(75)),
+                new TimeLog("Issue-1", new DateTime(2017, 07, 12, 10, 30, 00), TimeSpan.FromMinutes(45)),
+                new TimeLog("Issue-2", new DateTime(2017, 07, 11, 09, 00, 00), TimeSpan.FromHours(4)),
+                new TimeLog("Issue-3", new DateTime(2017, 07, 11, 13, 00, 00), TimeSpan.FromHours(3)),
+                new TimeLog("Issue-3", new DateTime(2017, 07, 10, 08, 35, 00), TimeSpan.FromMinutes(15)),
+            };
+        }
+
+        public ReactiveList<TimeLog> Logs { get; }
+
+        public ReactiveCommand<Unit, List<TimeLog>> ExecuteSearch { get; }
     }
 }
