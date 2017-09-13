@@ -6,17 +6,22 @@
              xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
              xmlns:local="clr-namespace:Omichron"
              mc:Ignorable="d" 
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             Background="{DynamicResource MaterialDesignPaper}"
+             TextElement.FontWeight="Medium"
+             TextElement.FontSize="14"
+             FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
              d:DesignHeight="300" d:DesignWidth="600" 
              d:DataContext="{d:DesignInstance local:DesignTimeLogsViewModel, IsDesignTimeCreatable=True}">
     <Grid>
         <DataGrid ItemsSource="{Binding Logs, diag:PresentationTraceSources.TraceLevel=High}" 
-                  AutoGenerateColumns="False" VerticalAlignment="Top">
+                  AutoGenerateColumns="False" VerticalAlignment="Top" >
             <DataGrid.GroupStyle>
                 <GroupStyle>
                     <GroupStyle.HeaderTemplate>
                         <DataTemplate>
-                            <StackPanel>
-                                <TextBlock Text="{Binding Path=Name}" />
+                            <StackPanel Background="LightSteelBlue">
+                                <TextBlock Text="{Binding Name}" Foreground="White" Margin="5 2 5 2"/>
                             </StackPanel>
                         </DataTemplate>
                     </GroupStyle.HeaderTemplate>
