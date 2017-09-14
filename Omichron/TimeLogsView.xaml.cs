@@ -1,9 +1,7 @@
-﻿using ReactiveUI;
-using System;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
+﻿using System.Reactive.Disposables;
 using System.Windows;
 using System.Windows.Controls;
+using ReactiveUI;
 
 namespace Omichron
 {
@@ -41,8 +39,4 @@ namespace Omichron
             set { ViewModel = (ITimeLogsViewModel)value; }
         }
     }
-}
-
-namespace System.Reactive.Disposables
-{
 }

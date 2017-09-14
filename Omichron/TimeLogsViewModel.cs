@@ -82,6 +82,11 @@ namespace Omichron
                 new TimeLog("Issue-3", new DateTime(2017, 07, 11, 13, 00, 00), TimeSpan.FromHours(3)),
                 new TimeLog("Issue-3", new DateTime(2017, 07, 10, 08, 35, 00), TimeSpan.FromMinutes(15)),
             };
+
+            CollectionViewSource
+                .GetDefaultView(Logs)
+                .GroupDescriptions
+                .Add(new PropertyGroupDescription(nameof(TimeLog.IssueId)));
         }
 
         public ReactiveList<TimeLog> Logs { get; }
