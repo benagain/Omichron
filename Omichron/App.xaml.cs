@@ -7,5 +7,6 @@ namespace Omichron
     /// </summary>
     public partial class App : Application
     {
+        public AppBootstrapper AppBootstrapper { get; } = new AppBootstrapper();
     }
 }

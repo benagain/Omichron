@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Omichron"
+        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         xmlns:rx="http://reactiveui.net"
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -20,7 +21,7 @@
             is at the front of the route stack.
         -->
         <rx:RoutedViewHost
-            Router="{Binding Router}"
+            Router="{Binding Router, diag:PresentationTraceSources.TraceLevel=High}"
             HorizontalContentAlignment="Stretch"
             VerticalContentAlignment="Stretch" />
     </Grid>

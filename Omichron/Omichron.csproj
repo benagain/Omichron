@@ -84,6 +84,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="System.Windows\ApplicationEventsExtensions.cs" />
     <Compile Include="System.Windows\IApplicationEvents.cs" />
     <Compile Include="System.Reactive.Disposables\CompositeDisposableExtensions.cs" />

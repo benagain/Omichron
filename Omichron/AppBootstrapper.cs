@@ -30,13 +30,10 @@ namespace Omichron
      * which decides which View to Navigate to when the application starts.
      */
 
-    public class AppBootstrapper : ReactiveObject, IScreen
+    public class AppBootstrapper : ReactiveObject
     {
-        public RoutingState Router { get; private set; }
-
         public AppBootstrapper(IMutableDependencyResolver dependencyResolver = null, RoutingState testRouter = null)
         {
-            Router = testRouter ?? new RoutingState();
             dependencyResolver = dependencyResolver ?? Locator.CurrentMutable;
 
             // Bind 
@@ -45,18 +42,15 @@ namespace Omichron
             // TODO: This is a good place to set up any other app 
             // startup tasks, like setting the logging level
             LogHost.Default.Level = LogLevel.Debug;
-
-            // Navigate to the opening page of the application
-            Router.Navigate.Execute(dependencyResolver.GetService<TimeLogsViewModel>());
         }
 
         private void RegisterParts(IMutableDependencyResolver dependencyResolver)
         {
-            dependencyResolver.RegisterConstant(this, typeof(IScreen));
-
+            dependencyResolver.RegisterLazySingleton(() => new MainWindowViewModel(), typeof(MainWindowViewModel));
+            dependencyResolver.Register(() => dependencyResolver.GetService<MainWindowViewModel>(), typeof(IScreen));
             dependencyResolver.Register(() => 
                 new TimeLogsViewModel(
-                    this,
+                    dependencyResolver.GetService<IScreen>(),
                     new ApplicationEvents(Application.Current).ToInterface(),
                     dependencyResolver.GetService<TimeLogSource>()), 
                 typeof(TimeLogsViewModel));

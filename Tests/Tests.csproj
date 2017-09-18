@@ -103,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoMockDataAttribute.cs" />
+    <Compile Include="TestMainWindowViewModel.cs" />
     <Compile Include="TestThrottleAfter.cs" />
     <Compile Include="Helpers\ObservableExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
