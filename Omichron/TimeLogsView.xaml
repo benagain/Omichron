@@ -14,7 +14,7 @@
              d:DesignHeight="300" d:DesignWidth="600" 
              d:DataContext="{d:DesignInstance local:DesignTimeLogsViewModel, IsDesignTimeCreatable=True}">
     <Grid>
-        <DataGrid ItemsSource="{Binding Logs, diag:PresentationTraceSources.TraceLevel=High}" 
+        <DataGrid ItemsSource="{Binding Logs}" 
                   AutoGenerateColumns="False" VerticalAlignment="Top" >
             <DataGrid.GroupStyle>
                 <GroupStyle>
