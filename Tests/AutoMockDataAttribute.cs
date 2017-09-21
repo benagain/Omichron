@@ -8,7 +8,8 @@ namespace Tests
     {
         public AutoMockDataAttribute()
             : base(new Fixture()
-                  .Customize(new AutoConfiguredNSubstituteCustomization()))
+                  .Customize(new AutoConfiguredNSubstituteCustomization())
+                  .Customize(new AutoFixture.NodaTime.NodaTimeCustomization()))
         {
         }
     }
