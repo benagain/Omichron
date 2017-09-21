@@ -1,11 +1,14 @@
-﻿using ReactiveUI;
+﻿using NodaTime.Extensions;
+using ReactiveUI;
 using Splat;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace Omichron
 {
-    public partial class MainWindow : Window, IViewFor<MainWindowViewModel>
+    public partial class MainWindow : Window, IViewFor<MainWindowViewModel>, IEnableLogger
     {
         public MainWindow()
         {
@@ -18,6 +21,15 @@ namespace Omichron
                 this.WhenAnyValue(x => x.ViewModel)
                     .BindTo(this, x => x.DataContext)
                     .AddTo(disposables);
+
+                Observable.FromEventPattern<SelectionChangedEventArgs>(
+                    h => StartDate.SelectedDateChanged += h,
+                    h => StartDate.SelectedDateChanged -= h)
+                    .Select(x => (x.Sender as DatePicker).SelectedDate.Value)
+                    .Select(x => x.ToLocalDateTime())
+                    .LoggedCatch(this)
+                    .BindTo(ViewModel, vm => vm.StartDate)
+                    ;
             });
         }
 

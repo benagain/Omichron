@@ -3,6 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:Omichron"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         xmlns:rx="http://reactiveui.net"
@@ -14,15 +16,23 @@
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         Title="MainWindow" Height="350" Width="525">
     <Grid UseLayoutRounding="True">
-        <!--
-            COOLSTUFF: RoutedViewHost
-        
-            RoutedViewHost will take a Router and display whatever ViewModel 
-            is at the front of the route stack.
-        -->
-        <rx:RoutedViewHost
-            Router="{Binding Router, diag:PresentationTraceSources.TraceLevel=High}"
-            HorizontalContentAlignment="Stretch"
-            VerticalContentAlignment="Stretch" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0">
+            <StackPanel Orientation="Horizontal">
+                <DatePicker Name="StartDate" Margin="16" 
+                            SelectedDate="{x:Static sys:DateTime.Now}" 
+                            materialDesign:HintAssist.Hint="Pick Date" 
+                            Style="{StaticResource MaterialDesignFloatingHintDatePicker}" />
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Row="1">
+            <rx:RoutedViewHost
+                Router="{Binding Router}"
+                HorizontalContentAlignment="Stretch"
+                VerticalContentAlignment="Stretch" />
+        </StackPanel>
     </Grid>
 </Window>
