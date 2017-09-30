@@ -69,28 +69,17 @@ namespace Omichron
         ViewModelActivator ISupportsActivation.Activator { get; } = new ViewModelActivator();
     }
 
-    public class DesignTimeLogsViewModel : ITimeLogsViewModel
+    public class DesignTimeLogsViewModel : TimeLogsViewModel
     {
         public DesignTimeLogsViewModel()
+            : base(null, null, null)
         {
-            Logs = new ReactiveList<TimeLog>
-            {
-                new TimeLog("Issue-1", new DateTime(2017, 07, 12, 10, 15, 00), TimeSpan.FromMinutes(15)),
-                new TimeLog("Issue-1", new DateTime(2017, 07, 12, 09, 00, 00), TimeSpan.FromMinutes(75)),
-                new TimeLog("Issue-1", new DateTime(2017, 07, 12, 10, 30, 00), TimeSpan.FromMinutes(45)),
-                new TimeLog("Issue-2", new DateTime(2017, 07, 11, 09, 00, 00), TimeSpan.FromHours(4)),
-                new TimeLog("Issue-3", new DateTime(2017, 07, 11, 13, 00, 00), TimeSpan.FromHours(3)),
-                new TimeLog("Issue-3", new DateTime(2017, 07, 10, 08, 35, 00), TimeSpan.FromMinutes(15)),
-            };
-
-            CollectionViewSource
-                .GetDefaultView(Logs)
-                .GroupDescriptions
-                .Add(new PropertyGroupDescription(nameof(TimeLog.IssueId)));
+            Logs.Add(new TimeLog("Issue-1", new DateTime(2017, 07, 12, 10, 15, 00), TimeSpan.FromMinutes(15)));
+            Logs.Add(new TimeLog("Issue-1", new DateTime(2017, 07, 12, 09, 00, 00), TimeSpan.FromMinutes(75)));
+            Logs.Add(new TimeLog("Issue-1", new DateTime(2017, 07, 12, 10, 30, 00), TimeSpan.FromMinutes(45)));
+            Logs.Add(new TimeLog("Issue-2", new DateTime(2017, 07, 11, 09, 00, 00), TimeSpan.FromHours(4)));
+            Logs.Add(new TimeLog("Issue-3", new DateTime(2017, 07, 11, 13, 00, 00), TimeSpan.FromHours(3)));
+            Logs.Add(new TimeLog("Issue-3", new DateTime(2017, 07, 10, 08, 35, 00), TimeSpan.FromMinutes(15)));
         }
-
-        public ReactiveList<TimeLog> Logs { get; }
-
-        public ReactiveCommand<Unit, List<TimeLog>> ExecuteSearch { get; }
     }
 }
