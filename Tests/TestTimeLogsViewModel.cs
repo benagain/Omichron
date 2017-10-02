@@ -12,13 +12,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
+using Tests.AutoFixture;
 using Xunit;
 
 namespace Tests
 {
-    namespace TimeLogsViewModelTests
-    {
-        public class TestTimeLogsViewModel
+	namespace TimeLogsViewModelTests
+	{
+		public class TestTimeLogsViewModel
         {
             // This isn't apparently needed, leaving it for a while just in case!
             //public TestTimeLogsViewModel()
@@ -35,39 +36,28 @@ namespace Tests
             }
 
 			[Theory, AutoMockData]
-			public void Logs_are_retrieved_when_search_is_executed([Frozen] List<TimeLog> expected, Generator<TimeLogsViewModel> sutgen)
+			public void Logs_are_retrieved_when_search_is_executed(AutoTestScheduler sched, [Frozen] List<TimeLog> expected, TimeLogsViewModel sut)
 			{
-				new TestScheduler().With(sched =>
-				{
-					var sut = sutgen.First();
-					// Given
-					((ISupportsActivation)sut).Activator.Activate();
-					// When
-					sut.ExecuteSearch.Execute().Subscribe();
-					sched.AdvanceByMs(1);
-					// Then
-					sut.Logs.Should().BeEquivalentTo(expected);
-				});
+				// Given
+				((ISupportsActivation)sut).Activator.Activate();
+				// When
+				sut.ExecuteSearch.Execute().Subscribe();
+				sched.AdvanceByMs(1);
+				// Then
+				sut.Logs.Should().BeEquivalentTo(expected);
 			}
 
 			[Theory, AutoMockData]
-            public void Logs_are_retrieved_when_application_is_activated(
-				[Frozen] IApplicationEvents events, 
-				Generator<TimeLogsViewModel> sutgen, 
-				[Frozen] List<TimeLog> expected)
+            public void Logs_are_retrieved_when_application_is_activated(AutoTestScheduler sched, [Frozen] IApplicationEvents events, TimeLogsViewModel sut, [Frozen] List<TimeLog> expected)
             {
-                new TestScheduler().With(sched =>
-                {
-					var sut = sutgen.First();
-                    // Given
-                    events.Activated.Returns(x => Observable.Return(new EventArgs()));
-                    // When
-                    ((ISupportsActivation)sut).Activator.Activate();
-					sched.AdvanceByMs(1);
+                // Given
+                events.Activated.Returns(x => Observable.Return(new EventArgs()));
+                // When
+                ((ISupportsActivation)sut).Activator.Activate();
+				sched.AdvanceByMs(1);
 
-					// Then
-					sut.Logs.Should().BeEquivalentTo(expected);
-                });
+				// Then
+				sut.Logs.Should().BeEquivalentTo(expected);
             }
 
             [Theory, AutoMockData]

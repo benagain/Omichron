@@ -4,6 +4,7 @@ using Ploeh.AutoFixture.Xunit2;
 using ReactiveUI;
 using Splat;
 using System;
+using Tests.AutoFixture;
 using Xunit;
 
 namespace Tests

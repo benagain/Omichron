@@ -105,9 +105,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutoMockDataAttribute.cs" />
+    <Compile Include="AutoFixture.Customisations\AutoMockDataAttribute.cs" />
     <Compile Include="AutoFixture.NodaTime\LocalDateTimeFromDateTime.cs" />
     <Compile Include="AutoFixture.NodaTime\NodaTimeCustomization.cs" />
+    <Compile Include="AutoFixture.Customisations\AutoTestScheduler.cs" />
     <Compile Include="TestMainWindowViewModel.cs" />
     <Compile Include="TestThrottleAfter.cs" />
     <Compile Include="Helpers\ObservableExtensions.cs" />
